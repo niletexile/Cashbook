@@ -89,14 +89,22 @@ body.locked .wrap{display:none}
 .role-pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;background:#eef5f3;color:var(--denim)}.role-pill.admin{background:#fde8d8;color:#9a4a14}
 .ubox{background:#f3f7f6;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
 .uperms{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:10px;font-size:13px}.uperms label{display:flex;gap:6px;align-items:center;cursor:pointer}
-.utbl{width:100%;border-collapse:collapse;font-size:13px;min-width:1100px}.utbl th{font-size:11px;white-space:normal}.utbl td{text-align:center;padding:8px 6px}
+.utbl{width:100%;border-collapse:collapse;font-size:13px;min-width:1500px}.utbl th{font-size:11px;white-space:normal}.utbl td{text-align:center;padding:8px 6px}
 .utbl input.u-name{width:140px;text-align:center;padding:6px;border:1px solid var(--line);border-radius:6px}
 .noacc{text-align:center;padding:50px 10px;color:var(--muted)}
 .netbar{position:fixed;left:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:900;display:flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:calc(100vw - 20px);padding:6px 11px;border-radius:999px;background:rgba(10,54,49,.93);color:#fff;font:600 11px/1.2 system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;box-shadow:0 2px 10px rgba(0,0,0,.25)}
-.netbar[hidden]{display:none}.netbar .dot{width:8px;height:8px;border-radius:50%;background:#3fbf8a;flex:none}.netbar.off .dot{background:#e0a030}
+.netbar[hidden]{display:none}.netbar .dot{width:8px;height:8px;border-radius:50%;background:#3fbf8a;flex:none}.netbar.off .dot,.netbar.busy .dot{background:#e0a030}.netbar.busy .dot{animation:netpulse 1s ease-in-out infinite}@keyframes netpulse{50%{opacity:.3}}
 .netbar button{border:0;border-radius:999px;padding:4px 10px;font:700 11px system-ui,"Segoe UI",Tahoma,sans-serif;background:#e07b39;color:#0a3631;cursor:pointer}
 .netbar button[hidden],.netbar span[hidden]{display:none}.netbar #netPending{color:#ffc9a0}.netbar #netLast{opacity:.8;font-weight:500}.netbar #netVer{opacity:.6;font-weight:500;font-size:10px;direction:ltr}
 .login-ver{text-align:center;color:var(--muted);font-size:11px;direction:ltr}
+.closeban{background:#fff7ec;border:1px solid #f0c89a;color:#9a4a14;border-radius:10px;padding:9px 14px;margin:0 0 12px;font-size:13px}
+.frow{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}.frow label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:var(--denim)}
+.frow input,.frow select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff}.frow .grow{flex:1;min-width:220px}.frow .grow input{width:100%;box-sizing:border-box}
+table.cnt{border-collapse:collapse;width:100%;max-width:520px}table.cnt th,table.cnt td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:center;font-size:13px}table.cnt td:first-child{text-align:right;font-weight:700}
+table.cnt input{width:110px;text-align:center;padding:7px;border:1px solid var(--line);border-radius:8px;font:inherit}
+.cnsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}.cnsum div{background:#f3f8f7;border:1px solid var(--line);border-radius:10px;padding:10px 14px}.cnsum span{display:block;font-size:12px;color:var(--muted)}.cnsum b{font-size:19px}
+.diff-ok{color:var(--ok);font-weight:800}.diff-bad{color:var(--bad);font-weight:800}
+.chip-open{display:inline-flex;gap:8px;align-items:center;background:#fff7ec;border:1px solid #f0c89a;border-radius:99px;padding:4px 6px 4px 12px;margin:4px 6px 0 0;font-size:13px}
 @media print{.login-screen,.modal,.netbar{display:none!important}}
 </style></head><body>
 <div class="wrap">
@@ -105,7 +113,7 @@ body.locked .wrap{display:none}
   <div class="chips"><span title="تغيير" onclick="$('#logoIn').click()">✎</span><span title="حذف" onclick="rmLogo()">✕</span></div>
   <input type="file" id="logoIn" accept="image/*" hidden onchange="upLogo(event)"></div>
  <h1 id="ttl">يومية الخزينة</h1><span class="sp"></span>
- <span id="syncChip" class="muted" style="color:#cfe0dc"></span><button class="who" id="bellBtn" onclick="openAlerts()">🔔 تنبيهات<span id="bell"></span></button><button class="who" onclick="openUser()">👤 <span id="uLbl"></span></button><button class="who" onclick="doLogout()" title="تسجيل الخروج">⎋ خروج</button></div>
+ <button class="who" id="bellBtn" onclick="openAlerts()">🔔 تنبيهات<span id="bell"></span></button><button class="who" onclick="openUser()">👤 <span id="uLbl"></span></button><button class="who" onclick="doLogout()" title="تسجيل الخروج">⎋ خروج</button></div>
  <nav id="nav"></nav></header>
 <main id="app"></main><div class="sigs"><div>أمين الخزينة</div><div>المراجعة</div><div>مدير الحسابات</div><div>المدير المالي</div></div></div>
 <div id="loginScreen" class="login-screen show">
@@ -197,7 +205,7 @@ const TB={
  Treasury:{t:'يومية الخزينة',pre:'TRS',cols:[['التاريخ','date'],['الوارد','num'],['المنصرف','num'],['رقم الاذن','text'],['البيان','text'],['نوع البيان','cat']]},
  Receivable:{t:'أوراق القبض',pre:'REC',amt:'المبلغ',st:'الحالة',cols:[['نوع الحركة','list:نوع الحركة'],['التاريخ','date'],['رقم الاذن','text'],['رقم الشيك','text'],['تاريخ الاستحقاق','date'],['اسم العميل','text'],['المبلغ','num'],['البنك','list:البنك'],['العملة','list:العملات'],['الحالة','list:حالات أوراق القبض'],['ملاحظات','text']]},
  Payable:{t:'أوراق الدفع',pre:'PAY',amt:'المبلغ',st:'الحالة',cols:[['التاريخ','date'],['رقم الاذن','text'],['رقم الشيك','text'],['تاريخ الاستحقاق','date'],['اسم المورد / المستفيد','text'],['البنك المسحوب عليه','list:البنك'],['المبلغ','num'],['العملة','list:العملات'],['الحالة','list:حالات أوراق الدفع'],['ملاحظات','text']]}};
-let db={master:SEED.master||{},settings:SEED.settings||{},tables:{Treasury:[],Receivable:[],Payable:[]}};
+let db={master:SEED.master||{},settings:SEED.settings||{},tables:{Treasury:[],Receivable:[],Payable:[]},closings:{through:'',open:[]}};
 let user='',logo='',logoView='';try{logo=localStorage.getItem(LS.logo)||''}catch(e){}
 const logoSrc=()=>logo||logoView;
 const logoFixed=()=>document.body.classList.contains('logo-fixed');
@@ -211,11 +219,11 @@ let saveT=0,warned=false;
 const saveLocal=()=>{clearTimeout(saveT);saveT=setTimeout(async()=>{try{await idbSet(cacheKey(),db)}catch(e){if(!warned){warned=true;toast('⚠ تعذر الحفظ على الجهاز - الشيت هو النسخة الأساسية','err')}}},300)};
 // بيشيل أعمدة التسجيل (أنشئ بواسطة...) من النسخة المحلية عشان الحجم يقل
 const slim=t=>{const o={};for(const k in t){const keep=['ID','الترتيب'].concat(TB[k]?TB[k].cols.map(c=>c[0]):[]);o[k]=t[k].map(r=>{const n={};keep.forEach(c=>{if(r[c]!==undefined)n[c]=r[c]});return n})}return o};
-const APP_VERSION = 'v1.0 · 4 Nov 2026';   // غيّر الرقم ده كل مرة ترفع نسخة جديدة على GitHub، يظهر في الشريط اللي تحت وفي شاشة الدخول على كل جهاز
+const APP_VERSION = 'v1.2 · 8 Nov 2026';   // غيّر الرقم ده كل مرة ترفع نسخة جديدة على GitHub، يظهر في الشريط اللي تحت وفي شاشة الدخول على كل جهاز
 const COMPANY_LOGO_DEFAULT = '';   // اختياري: كود الصورة نفسه (data:image/...) يتحط هنا بدل الملف
 // أو: ملف اللوجو بجانب index.html على GitHub (الافتراضي logo.jpg). فاضي = ما يستخدمش ملف.
 const COMPANY_LOGO_URL = 'logo.jpg';
-const DEFAULT_URL='https://script.google.com/macros/s/AKfycbx83y0qAHVXhsDwrT9znQnyoVKmXQKmLmQDQKLqQISgyogIISsF1BsSy-XWXSJnpQBYeA/exec'; // الصق رابط الـ Web App بين العلامتين '' (ينتهي بـ /exec) وهيسمع على طول من غير أي إعداد
+const DEFAULT_URL='https://script.google.com/macros/s/AKfycbxG4w_LoEu3BSKIoYeOOPQ29HpjHUuAYtDagIOQ662aR_59wBuwyJI56z-5nKshz0fy/exec'; // الصق رابط الـ Web App بين العلامتين '' (ينتهي بـ /exec) وهيسمع على طول من غير أي إعداد
 const url=()=>(DEFAULT_URL||localStorage.getItem(LS.url)||'').trim();   // الرابط المدمج في الملف له الأولوية
 const L=n=>(db.master[n]||[]).map(o=>o.name);
 const openBal=()=>+db.settings[SK.open]||0;
@@ -232,11 +240,12 @@ function api(action,payload){const u=url();
   .then(r=>r.text().then(t=>{try{return JSON.parse(t)}catch(x){const e=new Error('الرابط مش بيرد صح — تأكد إن الـ Web App منشور (Execute as: Me / Anyone) وإن الرابط بينتهي بـ /exec');e.network=true;e.badAnswer=true;throw e}}))
   .then(d=>{if(d.status!=='ok'){const e=new Error(d.message||'فشل الطلب');e.code=d.code;if(d.code==='AUTH'&&action!=='login')showLogin(d.message);throw e}return d})}
 let syncing=false,lastSync=null;
-const chip=t=>{const c=$('#syncChip');if(c)c.textContent=t};
+let syncState='';   // '' | busy | fail : بيظهر في الشريط اللي تحت بس (نقطة بتنبض أثناء التحديث)
+const chip=t=>{syncState=/⏳/.test(t)?'busy':/⚠|📴/.test(t)?'fail':'';OFFLINE.updateBar()};
 async function syncAll(auto){if(syncing||!session)return;if(session.offline){chip('📴 وضع أوفلاين');OFFLINE.updateBar();return}syncing=true;chip('⏳ جاري المزامنة...');
  try{await OFFLINE.sync(false,true);const d=await api('load');
   if(Object.keys(d.master||{}).length)db.master=d.master;if(Object.keys(d.settings||{}).length)db.settings=d.settings;db.tables=Object.assign(db.tables,slim(d.tables||{}));
-  if(d.user)applySession(d.user);await OFFLINE.reapply();saveLocal();lastSync=new Date();OFFLINE.updateBar();
+  if(d.user)applySession(d.user);if(d.closings)db.closings=d.closings;await OFFLINE.reapply();saveLocal();lastSync=new Date();OFFLINE.updateBar();
   if(!auto)render();else if(TB[S.page])renderBody(S.page);else if(S.page==='report')render();
   updateBell();chip('🟢 آخر مزامنة '+pad(lastSync.getHours())+':'+pad(lastSync.getMinutes()));
   const n=x=>(db.tables[x]||[]).length;if(!auto)toast(`✓ تم السحب: ${n('Treasury')} حركة خزينة، ${n('Receivable')} قبض، ${n('Payable')} دفع`)}
@@ -256,7 +265,7 @@ function view(t){const f=S.f[t],rows=t==='Treasury'?ledger():sorted(t);
  return{rows,inR,v}}
 
 /* ---------- shell ---------- */
-const PAGES=[['Treasury','💳 يومية الخزينة','treasury_view'],['Receivable','📄 أوراق القبض','notes_view'],['Payable','📄 أوراق الدفع','notes_view'],['report','📊 تقرير حركة الخزينة','report_view'],['settings','⚙️ الإعدادات','settings_view'],['users','👥 المستخدمين','@admin']];
+const PAGES=[['Treasury','💳 يومية الخزينة','treasury_view'],['Receivable','📄 أوراق القبض','notes_view'],['Payable','📄 أوراق الدفع','notes_view'],['report','📊 تقرير حركة الخزينة','report_view'],['closing','🔒 إقفال اليومية','day_close'],['count','🧮 جرد الخزينة','count_view'],['settings','⚙️ الإعدادات','settings_view'],['users','👥 المستخدمين','@admin'],['audit','📜 السجل والنسخ','@admin']];
 const visiblePages=()=>PAGES.filter(p=>p[2]==='@admin'?isAdmin():can(p[2]));
 const permOf=(t,a)=>(t==='Treasury'?'treasury_':'notes_')+a;
 function go(p){S.page=p;S.edit=null;render();scrollTo(0,0)}
@@ -267,8 +276,8 @@ function render(){
  $('#bellBtn').style.display=can('notes_view')?'':'none';
  $('#nav').innerHTML=vp.map(([k,l])=>`<button class="${S.page===k?'on':''}" onclick="go('${k}')">${l}</button>`).join('');
  $('#uLbl').textContent=user||'—';$('#pfoot').textContent='طُبع: '+dm(today())+(user?' | بواسطة: '+user:'');applyLogo();
- const p=S.page;$('#app').innerHTML=TB[p]?tablePage(p):p==='report'?repPage():p==='users'?usersPage():p==='none'?'<div class="noacc"><h3>🔒 ليس لديك صلاحية لعرض أي شاشة</h3>اطلب من مدير النظام تفعيل الصلاحيات المناسبة لحسابك.</div>':setPage();
- if(TB[p])renderBody(p);if(p==='report')repBody();if(p==='users')loadUsers();
+ const p=S.page;$('#app').innerHTML=TB[p]?tablePage(p):p==='report'?repPage():p==='users'?usersPage():p==='closing'?closingPage():p==='count'?countPage():p==='audit'?auditPage():p==='none'?'<div class="noacc"><h3>🔒 ليس لديك صلاحية لعرض أي شاشة</h3>اطلب من مدير النظام تفعيل الصلاحيات المناسبة لحسابك.</div>':setPage();
+ if(TB[p])renderBody(p);if(p==='report')repBody();if(p==='users')loadUsers();if(p==='closing')loadClosing();if(p==='count')loadCount();if(p==='audit'){loadBackup();loadAudit(true)}
  if(p==='settings'&&!can('settings_edit'))document.querySelectorAll('#app input,#app button,#app .tag button').forEach(x=>{x.disabled=true});
  updateBell()}
 const phead=(t,id)=>`<div class="phead"><span>${logoSrc()?`<img src="${logoSrc()}">`:''}</span><h1${id?` id="${id}"`:''}>${esc(t)}</h1><span></span></div>`;
@@ -285,7 +294,7 @@ function tablePage(t){const c=TB[t],f=S.f[t],e=S.edit&&S.edit.t===t?find(t,S.edi
   return`<label class="${k==='البيان'?'wide':''}">${k}${inp}</label>`}).join('');
  const stOpts=t==='Treasury'?`<option value="in"${f.s==='in'?' selected':''}>وارد فقط</option><option value="out"${f.s==='out'?' selected':''}>منصرف فقط</option>`:L(t==='Receivable'?'حالات أوراق القبض':'حالات أوراق الدفع').map(x=>`<option${f.s===x?' selected':''}>${esc(x)}</option>`).join('');
  const cats=[...new Set(L('التصنيفات').concat(db.tables.Treasury.map(r=>r['نوع البيان']).filter(Boolean)))];
- return`${phead(t==='Treasury'?c.t:noteTitle(t),t==='Treasury'?'':'ptitle')}<div id="cards"></div>
+ return`${phead(t==='Treasury'?c.t:noteTitle(t),t==='Treasury'?'':'ptitle')}<div id="closeBan">${closeBanner(t)}</div><div id="cards"></div>
  <div class="card noprint"${can(permOf(t,'edit'))?'':' hidden'}><b style="color:var(--denim)">${e?'✎ تعديل حركة':'＋ إضافة حركة'}</b><div class="fgrid" style="margin-top:10px">${form}</div>
   <button class="primary" onclick="saveForm('${t}')">${e?'حفظ التعديل':'حفظ'}</button> ${e?'<button onclick="S.edit=null;render()">إلغاء</button>':''}</div>
  <div class="bar row"><label>من <input type="date" value="${f.from||''}" onchange="S.f.${t}.from=this.value;S.pg.${t}=0;renderBody('${t}')"></label>
@@ -297,7 +306,7 @@ function tablePage(t){const c=TB[t],f=S.f[t],e=S.edit&&S.edit.t===t?find(t,S.edi
   <button onclick="syncAll()">🔄 تحديث من الشيت</button>${can('print')?'<button onclick="doPrint()">🖨 طباعة / PDF</button><button onclick="exportPage()">⬇ Excel</button>':''}</div>
  <div class="tw" id="tbl"></div><div id="pager" class="row noprint" style="margin-top:10px"></div>`}
 
-function renderBody(t){const c=TB[t],{inR,v}=view(t),isT=t==='Treasury';
+function renderBody(t){const cb=$('#closeBan');if(cb)cb.innerHTML=closeBanner(t);const c=TB[t],{inR,v}=view(t),isT=t==='Treasury';
  const P=S.all?v:v.slice(S.pg[t]*PAGE,(S.pg[t]+1)*PAGE);
  let cards='',foot='';
  if(isT){const f=S.f[t],led=ledger(),o=f.from?balBefore(led,f.from):openBal(),i=inR.reduce((a,r)=>a+(+r['الوارد']||0),0),x=inR.reduce((a,r)=>a+(+r['المنصرف']||0),0);
@@ -313,7 +322,7 @@ function renderBody(t){const c=TB[t],{inR,v}=view(t),isT=t==='Treasury';
  const off=S.all?0:S.pg[t]*PAGE;
  const tr=P.map((r,i)=>{const cells=isT?`<td>${dm(r['التاريخ'])}</td><td class="in">${r['الوارد']?fmt(r['الوارد']):''}</td><td class="out">${r['المنصرف']?fmt(r['المنصرف']):''}</td><td class="bal">${fmt(r.bal)}</td><td>${esc(r['رقم الاذن'])}</td><td class="l">${esc(r['البيان'])}</td><td>${esc(r['نوع البيان'])}</td>`
    :c.cols.map(([k,ty])=>`<td${k==='ملاحظات'?' class="l"':(k==='التاريخ'&&hideD?' class="np"':'')}>${ty==='date'?dm(r[k]):ty==='num'?fmt(r[k]):esc(r[k])}</td>`).join('');
-  return`<tr><td>${off+i+1}</td>${cells}<td class="noprint">${can(permOf(t,'edit'))?`<button class="ib" onclick="editRow('${t}','${r.ID}')">✎</button>`:''} ${can(permOf(t,'delete'))?`<button class="ib d" onclick="delRow('${t}','${r.ID}')">🗑</button>`:''}</td></tr>`}).join('');
+  return`<tr><td>${off+i+1}</td>${cells}<td class="noprint">${rowActions(t,r)}</td></tr>`}).join('');
  $('#tbl').innerHTML=`<table><thead><tr>${heads.map(h=>`<th${h==='التاريخ'&&hideD?' class="np"':''}>${h}</th>`).join('')}<th class="noprint"></th></tr></thead><tbody>${tr||`<tr><td colspan="${heads.length+1}" class="muted">لا توجد بيانات</td></tr>`}</tbody>${foot?`<tfoot>${foot}</tfoot>`:''}</table>`;
  const pages=Math.ceil(v.length/PAGE);
  $('#pager').innerHTML=pages>1?`<button ${S.pg[t]?'':'disabled'} onclick="S.pg.${t}--;renderBody('${t}')">السابق</button><span class="muted">صفحة ${S.pg[t]+1} من ${pages}</span><button ${S.pg[t]<pages-1?'':'disabled'} onclick="S.pg.${t}++;renderBody('${t}')">التالي</button>`:''}
@@ -321,6 +330,7 @@ function renderBody(t){const c=TB[t],{inR,v}=view(t),isT=t==='Treasury';
 function saveForm(t){const c=TB[t];if(!can(permOf(t,'edit')))return toast('⛔ ليس لديك صلاحية الإضافة/التعديل','err');
  const row={};c.cols.forEach(([k,ty],i)=>{const v=$('#f'+i).value.trim();row[k]=ty==='num'?(v===''?0:+v):v});
  if(!row['التاريخ'])return toast('⚠ اكتب التاريخ','err');
+ if(t==='Treasury'){const old0=S.edit&&S.edit.t===t?find(t,S.edit.id):null;for(const d0 of [row['التاريخ'],old0&&old0['التاريخ']])if(d0&&closedOn(d0))return toast(lockMsg(d0),'err')}
  if(c.cols.some(([k,ty])=>ty==='num'&&(isNaN(row[k])||row[k]<0)))return toast('⚠ المبلغ غير صحيح','err');
  if(t==='Treasury'&&!row['الوارد']&&!row['المنصرف']&&!row['البيان'])return toast('⚠ اكتب مبلغ أو بيان','err');
  if(c.amt&&!row[c.amt])return toast('⚠ اكتب المبلغ','err');
@@ -331,8 +341,8 @@ function saveForm(t){const c=TB[t];if(!can(permOf(t,'edit')))return toast('⛔ �
  S.last[t]=row['التاريخ'];S.edit=null;saveLocal();
  commit('upsert',{table:t,row},'✓ تم الحفظ');if(newCat)commit('addlistitem',{list:'التصنيفات',name:row['نوع البيان']},'');
  render();const f0=$('#f1');if(f0&&t==='Treasury')f0.focus()}
-function editRow(t,id){if(!can(permOf(t,'edit')))return toast('⛔ ليس لديك صلاحية التعديل','err');S.edit={t,id};render();scrollTo(0,0)}
-function delRow(t,id){if(!can(permOf(t,'delete')))return toast('⛔ ليس لديك صلاحية الحذف','err');if(!confirm('تأكيد حذف الحركة؟'))return;db.tables[t]=db.tables[t].filter(r=>r.ID!==id);saveLocal();commit('delete',{table:t,id},'تم الحذف');renderBody(t)}
+function editRow(t,id){if(!can(permOf(t,'edit')))return toast('⛔ ليس لديك صلاحية التعديل','err');const r0=find(t,id);if(t==='Treasury'&&r0&&closedOn(r0['التاريخ']))return toast(lockMsg(r0['التاريخ']),'err');S.edit={t,id};render();scrollTo(0,0)}
+function delRow(t,id){if(!can(permOf(t,'delete')))return toast('⛔ ليس لديك صلاحية الحذف','err');const r0=find(t,id);if(t==='Treasury'&&r0&&closedOn(r0['التاريخ']))return toast(lockMsg(r0['التاريخ']),'err');if(!confirm('تأكيد حذف الحركة؟'))return;db.tables[t]=db.tables[t].filter(r=>r.ID!==id);saveLocal();commit('delete',{table:t,id},'تم الحذف');renderBody(t)}
 
 /* ---------- report ---------- */
 function repPage(){if(!S.rep){const d=lastDate();S.rep={from:d,to:d}}const r=S.rep;
@@ -411,8 +421,8 @@ function rmLogo(){if(logoFixed())return;logo='';localStorage.removeItem(LS.logo)
 /* ---------- الدخول والصلاحيات ---------- */
 let session=null,perms=[],role='',started=false;
 const SESSION_KEY='trs_session_v1';
-const PERM_DEFS=[['treasury_view','عرض الخزينة'],['treasury_edit','إضافة/تعديل الخزينة'],['treasury_delete','حذف حركات الخزينة'],['notes_view','عرض أوراق القبض والدفع'],['notes_edit','إضافة/تعديل الأوراق'],['notes_delete','حذف الأوراق'],['report_view','تقرير الحركة'],['print','طباعة / PDF / Excel'],['settings_view','عرض الإعدادات'],['settings_edit','تعديل الإعدادات والقوائم']];
-const PRESETS={'أمين الخزينة':['treasury_view','treasury_edit','notes_view','notes_edit','report_view','print'],'المراجعة (عرض فقط)':['treasury_view','notes_view','report_view','print'],'مدير الحسابات':['treasury_view','treasury_edit','treasury_delete','notes_view','notes_edit','notes_delete','report_view','print','settings_view'],'المدير المالي (عرض فقط)':['treasury_view','notes_view','report_view','print','settings_view']};
+const PERM_DEFS=[['treasury_view','عرض الخزينة'],['treasury_edit','إضافة/تعديل الخزينة'],['treasury_delete','حذف حركات الخزينة'],['notes_view','عرض أوراق القبض والدفع'],['notes_edit','إضافة/تعديل الأوراق'],['notes_delete','حذف الأوراق'],['report_view','تقرير الحركة'],['print','طباعة / PDF / Excel'],['settings_view','عرض الإعدادات'],['settings_edit','تعديل الإعدادات والقوائم'],['day_close','قفل وفتح اليومية'],['count_view','عرض الجرد'],['count_edit','تسجيل الجرد']];
+const PRESETS={'أمين الخزينة':['treasury_view','treasury_edit','notes_view','notes_edit','report_view','print','count_view','count_edit'],'المراجعة (عرض فقط)':['treasury_view','notes_view','report_view','print','count_view'],'مدير الحسابات':['treasury_view','treasury_edit','treasury_delete','notes_view','notes_edit','notes_delete','report_view','print','settings_view','day_close','count_view','count_edit'],'المدير المالي (عرض فقط)':['treasury_view','notes_view','report_view','print','settings_view','count_view']};
 const isAdmin=()=>role==='admin';
 const can=p=>isAdmin()||perms.indexOf(p)!==-1;
 const cacheKey=()=>'db_'+(session?session.username:'');
@@ -422,7 +432,7 @@ function loginMsg(t){const el=$('#loginError');el.textContent=t||'';el.hidden=!t
 const EYE_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>',EYE_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.9 10.9 0 0 1 12 19c-7 0-11-7-11-7a19.8 19.8 0 0 1 5.06-5.94M9.9 4.24A10.9 10.9 0 0 1 12 4c7 0 11 7 11 7a19.7 19.7 0 0 1-3.17 4.19M14.12 14.12A3 3 0 1 1 9.88 9.88"/><path d="M1 1l22 22"/></svg>';
 function togglePw(){const i=$('#loginPass'),show=i.type==='password';i.type=show?'text':'password';$('#pwEye').innerHTML=show?EYE_OFF:EYE_ON}
 function showLogin(msg){OFFLINE.clearPw();$('#loginPass').type='password';$('#pwEye').innerHTML=EYE_ON;session=null;perms=[];role='';user='';try{sessionStorage.removeItem(SESSION_KEY)}catch(e){}
- db.tables={Treasury:[],Receivable:[],Payable:[]};db.settings=Object.assign({},SEED.settings||{});lastSync=null;
+ db.tables={Treasury:[],Receivable:[],Payable:[]};db.settings=Object.assign({},SEED.settings||{});db.closings={through:'',open:[]};lastSync=null;
  document.body.classList.add('locked');['accModal','aModal','uModal'].forEach(i=>{const m=$('#'+i);if(m)m.classList.remove('show')});
  $('#loginVer').textContent=APP_VERSION;refreshLoginLogo();
  loginMsg(msg);$('#loginScreen').classList.add('show');setTimeout(()=>$('#loginUser').focus(),60)}
@@ -439,12 +449,12 @@ async function doLogin(ev){ev.preventDefault();const btn=$('#loginBtn');btn.disa
 async function startSession(){
  document.body.classList.remove('locked');$('#loginScreen').classList.remove('show');
  try{idbSet('db',null)}catch(e){}   // امسح الكاش القديم غير المحمي (النسخة السابقة قبل تسجيل الدخول)
- try{const x=await idbGet(cacheKey());if(x){db.master=x.master||db.master;db.settings=x.settings||db.settings;db.tables=Object.assign({Treasury:[],Receivable:[],Payable:[]},slim(x.tables||{}))}}catch(e){}
+ try{const x=await idbGet(cacheKey());if(x){db.master=x.master||db.master;db.settings=x.settings||db.settings;db.closings=x.closings||db.closings;db.tables=Object.assign({Treasury:[],Receivable:[],Payable:[]},slim(x.tables||{}))}}catch(e){}
  if(!can('treasury_view')&&!can('report_view')){db.tables.Treasury=[];delete db.settings[SK.open];delete db.settings[SK.openDate]}
  if(!can('notes_view')){db.tables.Receivable=[];db.tables.Payable=[]}
  S.page=visiblePages().length?visiblePages()[0][0]:'none';render();
  syncAll(true);OFFLINE.onStart();
- if(!started){started=true;setInterval(()=>syncAll(true),120000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncAll(true)})}}
+ if(!started){started=true;setInterval(()=>syncAll(true),180000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(!lastSync||Date.now()-lastSync.getTime()>60000))syncAll(true)})}}
 function doLogout(){const t=session&&session.token;if(t)fetch(url(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'logout',token:t})}).catch(()=>{});
  try{idbSet(cacheKey(),null)}catch(e){}   // مسح نسخة الجهاز عند الخروج
  closeAccount();showLogin()}
@@ -510,7 +520,7 @@ const OFFLINE=(function(){
  const isNetworkError=e=>!!e&&(e.network||e instanceof TypeError||/failed to fetch|networkerror|load failed|network request failed/i.test(e.message||''));
  const isOffline=()=>navigator.onLine===false||!!(session&&session.offline);
  function updateBar(){const bar=document.getElementById('netBar');if(!bar)return;const off=isOffline();bar.classList.toggle('off',off);
-  document.getElementById('netTxt').textContent=off?'وضع أوفلاين':'متصل';
+  bar.classList.toggle('busy',syncState==='busy'&&!off);document.getElementById('netTxt').textContent=off?'وضع أوفلاين':(syncState==='fail'?'تعذر التحديث':'متصل');
   const p=document.getElementById('netPending');p.hidden=!mineCount;p.textContent='⏳ '+mineCount+' بانتظار الرفع';
   document.getElementById('netSync').hidden=!mineCount||off;
   document.getElementById('netLast').textContent=lastSync?'آخر مزامنة '+pad(lastSync.getHours())+':'+pad(lastSync.getMinutes()):'';
@@ -584,6 +594,83 @@ async function commit(type,payload,okMsg){
  else if(r&&r.stopped==='auth'){}
  else if(OFFLINE.count()>0)toast('📴 اتحفظ على الجهاز وهيترفع للشيت أول ما النت يرجع');
  else if(okMsg)toast(okMsg)}
+
+/* ===================== إقفال اليومية / جرد الخزينة / سجل النشاط والنسخ ===================== */
+const dmy=d=>d?String(d).split('-').reverse().join('/'):'';
+const closedOn=d=>{const c=db.closings||{};d=String(d||'').slice(0,10);return !!(d&&c.through&&d<=c.through&&!(c.open||[]).includes(d))};
+const lockMsg=d=>'🔒 يوم '+dmy(d)+' مقفول — اطلب من مدير الحسابات يفتحه للتعديل';
+const hardErr=e=>toast('⛔ '+(/authoriz|permission|DriveApp/i.test(e.message||'')?'محتاج صلاحية Google Drive: من الشيت افتح قائمة "نظام الخزينة" ← "نسخة احتياطية الآن" مرة واحدة ووافق على الصلاحيات':e.message),'err');
+const ymdLocal=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+function closeBanner(t){const c=db.closings||{};if(t!=='Treasury'||!c.through)return'';return`<div class="closeban noprint">🔒 اليومية مقفولة حتى <b>${dmy(c.through)}</b>${(c.open||[]).length?' — أيام مفتوحة مؤقتًا للتعديل: <b>'+c.open.map(dmy).join('، ')+'</b>':''}</div>`}
+function rowActions(t,r){if(t==='Treasury'&&closedOn(r['التاريخ']))return'<span title="اليوم مقفول — يفتحه مدير الحسابات">🔒</span>';
+ return(can(permOf(t,'edit'))?`<button class="ib" onclick="editRow('${t}','${r.ID}')">✎</button>`:'')+' '+(can(permOf(t,'delete'))?`<button class="ib d" onclick="delRow('${t}','${r.ID}')">🗑</button>`:'')}
+
+/* ----- إقفال اليومية (مدير الحسابات) ----- */
+function closingPage(){return`<div class="card"><b style="color:var(--denim)">🔒 إقفال اليومية</b>
+ <p class="muted" style="margin:6px 0 12px">الأيام المقفولة مفيش حد يقدر يضيف أو يعدّل أو يمسح فيها (ولا حتى المدير). لو اتكشف خطأ قديم: افتح اليوم بسبب، صحّح، وبعدين اقفله تاني. كل خطوة بتتسجّل باسمك.</p>
+ <div class="ubox" id="clState">جاري التحميل...</div>
+ <div class="ubox"><div class="frow"><label>إقفال كل الأيام حتى تاريخ<input type="date" id="clDate"></label><button class="primary" onclick="closeThrough()">🔒 إقفال</button></div></div>
+ <div class="ubox"><div class="frow"><label>فتح يوم قديم للتعديل<input type="date" id="roDate"></label><label class="grow">سبب الفتح (إجباري)<input id="roNote" placeholder="مثال: خطأ في مبلغ إيراد يوم ..." autocomplete="off"></label><button onclick="reopenDay()">🔓 فتح اليوم</button></div></div>
+ <div id="clOpen"></div></div>
+<div class="card"><b style="color:var(--denim)">📋 سجل الإقفال والفتح</b><div class="tw" id="clLog" style="margin-top:8px"></div></div>`}
+const CL_LABEL={CLOSE_THROUGH:'🔒 إقفال حتى',REOPEN_DAY:'🔓 فتح يوم',RECLOSE_DAY:'🔒 إعادة قفل يوم'};
+async function loadClosing(){try{const d=await api('closing.list');db.closings=d.closings;saveLocal();renderClosing(d.log)}catch(e){const b=$('#clState');if(b)b.innerHTML='<span class="late">⚠ '+esc(e.message)+'</span>'}}
+function renderClosing(log){const c=db.closings||{};if(!$('#clState'))return;
+ $('#clState').innerHTML=c.through?'الحالة: <b>مقفول حتى '+dmy(c.through)+'</b>':'الحالة: <b>مفيش أيام مقفولة لسه</b>';
+ if(!$('#clDate').value){const y=new Date();y.setDate(y.getDate()-1);$('#clDate').value=ymdLocal(y)}
+ $('#clOpen').innerHTML=(c.open||[]).length?'<b>أيام مفتوحة حاليًا للتعديل:</b><div>'+c.open.map(d=>`<span class="chip-open">🔓 ${dmy(d)} <button class="primary" onclick="recloseDay('${d}')">إعادة قفل</button></span>`).join('')+'</div>':'';
+ $('#clLog').innerHTML='<table><thead><tr><th>الوقت</th><th>العملية</th><th>التاريخ</th><th>بواسطة</th><th>السبب</th></tr></thead><tbody>'+((log||[]).map(e=>`<tr><td>${esc(e.time)}</td><td>${CL_LABEL[e.action]||esc(e.action)}</td><td>${dmy(e.date)}</td><td>${esc(e.name||e.username)}</td><td class="l">${esc(e.note)}</td></tr>`).join('')||'<tr><td colspan="5" class="muted">لسه مفيش عمليات إقفال</td></tr>')+'</tbody></table>'}
+async function closingCall(action,payload,msg){try{const r=await api(action,payload);db.closings=r.closings;saveLocal();renderClosing(r.log);toast(msg);return true}catch(e){hardErr(e);return false}}
+function closeThrough(){const d=$('#clDate').value;if(!d)return toast('⚠ اختار التاريخ','err');if(!confirm('تأكيد إقفال كل الأيام حتى '+dmy(d)+'؟\nمحدش هيقدر يعدّل فيها غير بعد ما تفتح اليوم بسبب.'))return;closingCall('closing.close',{date:d},'🔒 تم الإقفال حتى '+dmy(d))}
+async function reopenDay(){const d=$('#roDate').value,n=$('#roNote').value.trim();if(!d)return toast('⚠ اختار اليوم','err');if(n.length<3)return toast('⚠ اكتب سبب فتح اليوم','err');if(await closingCall('closing.reopen',{date:d,note:n},'🔓 تم فتح يوم '+dmy(d)+' للتعديل — افتكر تقفله بعد التصحيح')){$('#roDate').value='';$('#roNote').value=''}}
+const recloseDay=d=>closingCall('closing.reclose',{date:d},'🔒 تم إعادة قفل يوم '+dmy(d));
+
+/* ----- جرد الخزينة ----- */
+const DEN=[['200','200 جنيه'],['100','100 جنيه'],['50','50 جنيه'],['20','20 جنيه'],['10','10 جنيه'],['5','5 جنيه'],['1','1 جنيه'],['0.5','نص جنيه'],['0.25','ربع جنيه']];
+function countPage(){const ed=can('count_edit');return`${ed?`<div class="card"><b style="color:var(--denim)">🧮 جرد الخزينة</b>
+ <p class="muted" style="margin:6px 0 12px">عدّ النقدية الفعلية وسجّلها، والبرنامج بيحسب الرصيد الدفتري بنفسه ويسجّل الفرق. الجرد مش بيتعدّل ولا بيتمسح بعد الحفظ.</p>
+ <div class="frow"><label>تاريخ الجرد<input type="date" id="cnDate" value="${today()}" max="${today()}" onchange="cntCalc()"></label></div>
+ <div class="tw" style="margin-top:10px"><table class="cnt"><thead><tr><th>الفئة</th><th>العدد</th><th>الإجمالي</th></tr></thead><tbody>${DEN.map(([k,l])=>`<tr><td>${l}</td><td><input type="number" min="0" step="1" inputmode="numeric" class="cn-in" data-k="${k}" oninput="cntCalc()"></td><td class="cn-sub" data-k="${k}">0.00</td></tr>`).join('')}
+ <tr><td>مبالغ أخرى (إيصالات / شيكات…)</td><td><input type="number" min="0" step="any" id="cnOther" inputmode="decimal" oninput="cntCalc()"></td><td id="cnOtherSub">0.00</td></tr></tbody></table></div>
+ <div class="cnsum" id="cnSum"></div>
+ <div class="frow"><label class="grow">ملاحظات<input id="cnNote" placeholder="اختياري" autocomplete="off"></label><button class="primary" onclick="saveCount()">💾 حفظ الجرد</button></div></div>`:''}
+<div class="card"><b style="color:var(--denim)">📋 سجل الجرد</b><div class="tw" id="cnHist" style="margin-top:8px"><p class="muted" style="padding:10px">جاري التحميل...</p></div></div>`}
+const cnLocalBal=d=>{let b=openBal();db.tables.Treasury.forEach(r=>{if(r['التاريخ']<=d)b+=(+r['الوارد']||0)-(+r['المنصرف']||0)});return Math.round(b*100)/100};
+function cntTotal(){let t=0;document.querySelectorAll('.cn-in').forEach(i=>{const n=Math.max(0,Math.floor(+i.value||0)),sub=n*(+i.dataset.k);document.querySelector('.cn-sub[data-k="'+i.dataset.k+'"]').textContent=fmt(sub);t+=sub});const o=Math.max(0,+$('#cnOther').value||0);$('#cnOtherSub').textContent=fmt(o);return Math.round((t+o)*100)/100}
+function cntCalc(){const a=cntTotal(),box=$('#cnSum');if(!box)return;const seeSys=can('treasury_view'),sys=seeSys?cnLocalBal($('#cnDate').value||today()):null,diff=seeSys?Math.round((a-sys)*100)/100:null;
+ box.innerHTML=`<div><span>الإجمالي الفعلي (العدّ)</span><b>${fmt(a)}</b></div>`+(seeSys?`<div><span>رصيد الدفتر</span><b>${fmt(sys)}</b></div><div><span>الفرق</span><b class="${diff===0?'diff-ok':'diff-bad'}">${diff===0?'مطابق ✓':(diff>0?'زيادة ':'عجز ')+fmt(Math.abs(diff))}</b></div>`:'<div><span>الفرق</span><b>هيتحسب عند الحفظ</b></div>')}
+async function loadCount(){cntCalc();try{const d=await api('count.list');renderCountHist(d.list)}catch(e){const h=$('#cnHist');if(h)h.innerHTML='<p class="late" style="padding:10px">⚠ '+esc(e.message)+'</p>'}}
+function renderCountHist(list){const h=$('#cnHist');if(!h)return;
+ h.innerHTML='<table><thead><tr><th>التاريخ</th><th>وقت التسجيل</th><th>الفعلي</th><th>الدفتري</th><th>الفرق</th><th>ملاحظات</th><th>بواسطة</th></tr></thead><tbody>'+((list||[]).map(r=>{const tip=Object.entries(r.denoms||{}).map(([k,n])=>n+'×'+k).join(' + ')+(r.other?' + أخرى '+r.other:'');
+  return`<tr title="${esc(tip)}"><td>${dmy(r.date)}</td><td>${esc(r.time)}</td><td>${fmt(r.actual)}</td><td>${fmt(r.system)}</td><td class="${r.diff===0?'diff-ok':'diff-bad'}">${r.diff===0?'مطابق ✓':(r.diff>0?'زيادة ':'عجز ')+fmt(Math.abs(r.diff))}</td><td class="l">${esc(r.note)}</td><td>${esc(r.name||r.username)}</td></tr>`}).join('')||'<tr><td colspan="7" class="muted">لسه مفيش جرد مسجّل</td></tr>')+'</tbody></table>'}
+async function saveCount(){const a=cntTotal();if(a<=0&&!confirm('الإجمالي صفر. تسجّل الجرد كده؟'))return;
+ const denoms={};document.querySelectorAll('.cn-in').forEach(i=>{const n=Math.max(0,Math.floor(+i.value||0));if(n)denoms[i.dataset.k]=n});
+ try{const r=await api('count.save',{date:$('#cnDate').value,denoms,other:Math.max(0,+$('#cnOther').value||0),note:$('#cnNote').value});
+  document.querySelectorAll('.cn-in,#cnOther,#cnNote').forEach(i=>i.value='');cntCalc();renderCountHist(r.list);
+  const d=r.saved.diff;toast(d===0?'✓ تم حفظ الجرد — مطابق للدفتر':'⚠ تم حفظ الجرد — '+(d>0?'زيادة ':'عجز ')+fmt(Math.abs(d)))}catch(e){hardErr(e)}}
+
+/* ----- سجل النشاط والنسخ الاحتياطي (مدير النظام) ----- */
+const ACT_LABEL={create:'إضافة حركة',update:'تعديل حركة',delete:'حذف حركة',login:'دخول',login_failed:'محاولة دخول فاشلة',savemaster:'تعديل القوائم/الإعدادات',addlistitem:'إضافة تصنيف',user_save:'حفظ مستخدم',user_delete:'حذف مستخدم',password_change:'تغيير كلمة سر',day_close:'إقفال يومية',day_reopen:'فتح يوم للتعديل',day_reclose:'إعادة قفل يوم',count_save:'جرد خزينة',backup:'نسخة احتياطية',backup_schedule:'جدولة النسخ'};
+const TBL_LABEL={Treasury:'الخزينة',Receivable:'أوراق القبض',Payable:'أوراق الدفع'};
+const KEY_LABEL={date:'التاريخ',note:'السبب',through:'حتى تاريخ',actual:'الفعلي',system:'الدفتري',diff:'الفرق',role:'الدور',active:'نشط',perms:'عدد الصلاحيات',passwordSet:'كلمة سر جديدة',attempt:'المحاولة رقم',list:'القائمة',name:'الاسم',lists:'عدد القوائم',on:'مفعّل'};
+function auditPage(){return`<div class="card"><b style="color:var(--denim)">💾 النسخ الاحتياطي (Google Drive)</b><div class="ubox" id="bkBox" style="margin-top:10px">جاري التحميل...</div></div>
+<div class="card"><b style="color:var(--denim)">📜 سجل النشاط</b>
+ <div class="frow" style="margin:10px 0"><label>المستخدم<select id="auUser"><option value="">الكل</option></select></label><label>العملية<select id="auKind"><option value="">الكل</option>${Object.entries(ACT_LABEL).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></label><label>من<input type="date" id="auFrom"></label><label>إلى<input type="date" id="auTo"></label><button class="primary" onclick="loadAudit()">بحث</button></div>
+ <div class="tw" id="auBody"><p class="muted" style="padding:10px">جاري التحميل...</p></div><p class="muted">بيعرض آخر 300 عملية مطابقة. السجل مش بيتعدّل من الصفحة.</p></div>`}
+function fmtDetails(a){let d;try{d=JSON.parse(a.details||'{}')}catch(e){return esc(a.details)}const v=x=>esc(typeof x==='object'?JSON.stringify(x):String(x===undefined||x===null?'':x));
+ if(d.changes){return Object.entries(d.changes).map(([k,x])=>esc(k)+': '+v(x[0])+' ← <b>'+v(x[1])+'</b>').join(' · ')||'—'}
+ return Object.entries(d).map(([k,x])=>esc(KEY_LABEL[k]||k)+': '+v(typeof x==='boolean'?(x?'نعم':'لا'):x)).join(' · ')||'—'}
+async function loadAudit(first){
+ if(first){try{const u=await api('users.list');const sel=$('#auUser');if(sel)sel.innerHTML='<option value="">الكل</option>'+u.users.map(x=>`<option value="${esc(x.username)}">${esc(x.name)} (${esc(x.username)})</option>`).join('')+'<option value="system">النظام (تلقائي)</option>'}catch(e){}}
+ try{const d=await api('audit.list',{username:$('#auUser').value,kind:$('#auKind').value,from:$('#auFrom').value,to:$('#auTo').value,limit:300});
+  $('#auBody').innerHTML='<table><thead><tr><th>الوقت</th><th>المستخدم</th><th>العملية</th><th>الجدول</th><th>التفاصيل</th></tr></thead><tbody>'+(d.list.map(a=>`<tr><td style="white-space:nowrap">${esc(a.time)}</td><td>${esc(a.name||a.username)}</td><td>${ACT_LABEL[a.action]||esc(a.action)}</td><td>${TBL_LABEL[a.table]||''}</td><td class="l" style="max-width:520px;word-break:break-word">${fmtDetails(a)}</td></tr>`).join('')||'<tr><td colspan="5" class="muted">مفيش سجلات مطابقة</td></tr>')+'</tbody></table>'}
+ catch(e){const b=$('#auBody');if(b)b.innerHTML='<p class="late" style="padding:10px">⚠ '+esc(e.message)+'</p>'}}
+async function loadBackup(){try{const s=await api('backup.status'),b=$('#bkBox');if(!b)return;
+ b.innerHTML=`آخر نسخة: <b>${esc(s.last||'لسه ما اتعملتش')}</b> · النسخ التلقائي اليومي: <b>${s.scheduled?'مفعّل ✅':'غير مفعّل ⚠'}</b> · بيحتفظ بآخر ${s.keep} نسخة${s.folderUrl?` · <a href="${esc(s.folderUrl)}" target="_blank" rel="noopener">فتح مجلد النسخ</a>`:''}
+ <div class="frow" style="margin-top:10px"><button class="primary" id="bkRun" onclick="runBackup()">💾 نسخة احتياطية الآن</button><button id="bkSch" onclick="setBackup(${!s.scheduled})">${s.scheduled?'إيقاف النسخ التلقائي':'تفعيل النسخ التلقائي (3 صباحًا)'}</button></div>`}
+ catch(e){const b=$('#bkBox');if(b)b.innerHTML='<span class="late">⚠ '+esc(e.message)+'</span>'}}
+async function runBackup(){const b=$('#bkRun');b.disabled=true;b.textContent='جاري النسخ…';try{await api('backup.run');toast('✓ تم عمل نسخة احتياطية')}catch(e){hardErr(e)}loadBackup();loadAudit()}
+async function setBackup(on){try{await api('backup.schedule',{on});toast(on?'✓ تم تفعيل النسخ اليومي':'تم إيقاف النسخ اليومي')}catch(e){hardErr(e)}loadBackup()}
 
 async function boot(){
  let s=null;try{s=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null')}catch(e){}
