@@ -223,7 +223,7 @@ const APP_VERSION = 'v1.2 · 8 Nov 2026';   // غيّر الرقم ده كل م�
 const COMPANY_LOGO_DEFAULT = '';   // اختياري: كود الصورة نفسه (data:image/...) يتحط هنا بدل الملف
 // أو: ملف اللوجو بجانب index.html على GitHub (الافتراضي logo.jpg). فاضي = ما يستخدمش ملف.
 const COMPANY_LOGO_URL = 'logo.jpg';
-const DEFAULT_URL='https://script.google.com/macros/s/AKfycbx83y0qAHVXhsDwrT9znQnyoVKmXQKmLmQDQKLqQISgyogIISsF1BsSy-XWXSJnpQBYeA/exec'; // الصق رابط الـ Web App بين العلامتين '' (ينتهي بـ /exec) وهيسمع على طول من غير أي إعداد
+const DEFAULT_URL='https://script.google.com/macros/s/AKfycbzq2lezW8YKtmD09eobAZNJkk6xJkVB9KcrSQao7FZU-mXgrETmg6ZeELolndXY2TkUsw/exec'; // الصق رابط الـ Web App بين العلامتين '' (ينتهي بـ /exec) وهيسمع على طول من غير أي إعداد
 const url=()=>(DEFAULT_URL||localStorage.getItem(LS.url)||'').trim();   // الرابط المدمج في الملف له الأولوية
 const L=n=>(db.master[n]||[]).map(o=>o.name);
 const openBal=()=>+db.settings[SK.open]||0;
